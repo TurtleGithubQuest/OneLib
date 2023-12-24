@@ -3,13 +3,12 @@ package configuration
 
 import Main.plugin
 import configuration.OneConfig.configs
-import message.Debug.debugMessage
-import message.Debug._
+import message.Debug.*
+import message.{Debug, DebugLevel}
 import utils.Exceptions.ConfigValueNotFoundException
 
 import com.typesafe.config
 import com.typesafe.config.*
-import dev.turtle.onelib.message.{Debug, DebugLevel}
 import org.bukkit.Bukkit
 import org.bukkit.Bukkit.getLogger
 
@@ -120,9 +119,8 @@ class OneConfig(configName: String) {
    * Initialization block
    */
   {
-    //reload
     configs.update(
-      if _folder.isBlank then name else s"$_folder.$name",
+      if _folder.isEmpty then name else s"$_folder.$name",
       this
     )
   }
