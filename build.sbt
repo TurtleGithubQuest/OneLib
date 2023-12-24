@@ -1,4 +1,4 @@
-ThisBuild / version := "0.1.0-SNAPSHOT"
+ThisBuild / version := "1.0.0"
 
 ThisBuild / scalaVersion := "3.3.1"
 
@@ -7,7 +7,7 @@ lazy val root = (project in file("."))
     name := "OneLib",
     sourceDirectory := file("./src/"),
     idePackagePrefix.withRank(KeyRanks.Invisible) := Some("dev.turtle.onelib"),
-    assembly / mainClass := Some("dev.turtle.grenades.Main"),
+    assembly / mainClass := Some("dev.turtle.onelib.Main"),
     assembly / assemblyJarName := name + "-" + version + ".jar",
     assembly / assemblyOutputPath := file(s"S:\\mc_server\\plugins\\${name.value}.jar")
   )

@@ -20,10 +20,10 @@ class Main extends JavaPlugin {
     Main.plugin = this
     //Conf.reload()
     //getCommand("grenade").setExecutor(OneCommand)
-    val commandExample: OneCommand = new CommandExample
+    //    new OneConfig("en_US").folder("language").copyDefaults
+    //    new OneConfig("example")
+    //val commandExample: OneCommand = new CommandExample
     OneCommand.registerCommands
-    new OneConfig("en_US").folder("language").copyDefaults
-    new OneConfig("example")
     OneConfig.reloadAll
   }
 
