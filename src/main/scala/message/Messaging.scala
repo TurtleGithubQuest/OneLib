@@ -7,7 +7,7 @@ import org.bukkit.command.CommandSender
 
 object Messaging {
   implicit class MessagingString(string: String) {
-    def bukkolorize: String = ChatColor.translateAlternateColorCodes('&', string)
+    def bukkolorize: String = MessagingExtension.bukkolorize(string)
   }
   implicit class MessagingCommandSender(sender: CommandSender) {
     def getLanguage: String = MessagingExtension.getPreferredLanguage(sender.getName)

@@ -7,6 +7,7 @@ import message.Placeholder.PlaceholderString
 
 import scala.collection.{immutable, mutable}
 import dev.turtle.onelib.configuration.OneConfig.{config, option}
+import org.bukkit.ChatColor
 
 
 object MessagingExtension {
@@ -30,4 +31,9 @@ object MessagingExtension {
       outputText=outputText.bukkolorize
     outputText
   }
+  /**
+   * @todo HEX color codes
+   * @return Colorized text
+  */
+  def bukkolorize(text: String): String = ChatColor.translateAlternateColorCodes('&', text)
 }
