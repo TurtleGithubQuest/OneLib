@@ -1,7 +1,7 @@
 package dev.turtle.onelib
 package message
 
-import Main.console
+import OneLib.console
 import message.Placeholder.PlaceholderString
 
 import Debug.Level.*

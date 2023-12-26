@@ -1,11 +1,11 @@
 package dev.turtle.onelib
-package command
 
+import command.OneCommand
 import configuration.OneConfig.config
 import message.Messaging.MessagingCommandSender
 import message.{Placeholder, Placeholders}
+import utils.Exceptions.oneAssert
 
-import dev.turtle.onelib.utils.Exceptions.oneAssert
 import org.bukkit
 import org.bukkit.Bukkit
 import org.bukkit.command.CommandSender

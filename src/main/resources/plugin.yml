@@ -4,7 +4,7 @@ author: Turtle
 load: STARTUP
 version: 1.0.0
 api-version: 1.20
-main: dev.turtle.onelib.Main
+main: dev.turtle.onelib.OneLib
 commands:
   onelib:
     aliases: [ol]

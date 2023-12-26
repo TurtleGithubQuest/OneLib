@@ -1,7 +1,7 @@
 package dev.turtle.onelib
 package command
 
-import Main.console
+import OneLib.console
 import command.OneCommand.{commands, registerCommand}
 import configuration.MessagingExtension.defaultLanguage
 import configuration.OneConfig.config

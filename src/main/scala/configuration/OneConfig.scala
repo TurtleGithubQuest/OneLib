@@ -1,7 +1,7 @@
 package dev.turtle.onelib
 package configuration
 
-import Main.plugin
+import OneLib.onelib
 import configuration.OneConfig.configs
 import message.Debug.*
 import message.{Debug, DebugLevel}
@@ -20,7 +20,7 @@ import scala.util.{Success, Try}
 class OneConfig(configName: String) {
   var name: String = configName
   private var _fileType: String = ".conf"
-  private val _pluginName: String = plugin.getName
+  private val _pluginName: String = onelib.getName
   private var _folder: String = ""
   private var _config: Config = ConfigFactory.empty
 
