@@ -1,6 +1,6 @@
 package dev.turtle.onelib
 
-import api.{OneLibAPI, OnePlugin}
+import api.OnePlugin
 import command.OneCommand
 import message.Debug.debugMessage
 import message.DebugLevel.INFO
@@ -22,7 +22,7 @@ object OneLib:
       onelib = plugin
       debugMessage(s"OneLib is running under ${plugin.getName}").level(INFO)
     } else if plugin ne this.onelib then debugMessage(s"Plugin '${plugin.getName}' successfully hooked into OneLib.").level(INFO)
-    OneLibAPI(plugin).command.registerAll
+    plugin.oneLibAPI.command.registerAll
     //OneConfig.reloadAll
     true
   }
