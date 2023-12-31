@@ -1,52 +1,24 @@
 package dev.turtle.onelib
+
 package message
 
 import OneLib.console
 import message.Placeholder.PlaceholderString
+import message.StylizedText.bukkolorize
 
-import Debug.Level.*
-import dev.turtle.onelib.configuration.MessagingExtension.bukkolorize
-import dev.turtle.onelib.message.Debug.{Level, getCurrentLevel}
 import org.bukkit.command.ConsoleCommandSender as Console
 
 import scala.collection.immutable
 
 
 object Debug {
-  private var currentDebugLevel = 1
-  private var prefix = s"&c&l[&f${OneLib.onelib.getName}&c&l]"
+  private var prefix = s"&c&l[&f${OneLib.onelib.getName}&c&l]&b"
   private var suffix = ""
   private var syntax = "%prefix%: %message%%suffix%"
-  def getCurrentLevel: Integer = this.currentDebugLevel
-  def setCurrentDebugLevel(newDebugLevel: Integer): Unit = currentDebugLevel = newDebugLevel
-  /**
-   * 1 - 49 = Trace
-   * <p> 50 - 99 = Debug
-   * <p> 100 - 149 = Info
-   * <p> 150 - 199 = Warn
-   * <p> 200 - 249 = Error
-   * <p> 250+      = Fatal
-   */
-  enum Level {
-    case TRACE
-    case DEBUG
-    case INFO
-    case WARN
-    case ERROR
-    case FATAL
-  }
-  private val levelMap: immutable.Map[Debug.Level, Int] = Map(
-    TRACE -> 1,
-    DEBUG -> 50,
-    INFO -> 100,
-    WARN -> 150,
-    ERROR -> 200,
-    FATAL -> 250
-  )
 
   implicit class ConsoleMessage(console: Console){
-    def sendDebugMessage(messageText: String, debugLevel: DebugLevel, placeholders: Placeholders, withPrefix: Boolean=true, withSuffix: Boolean=true): Boolean = {
-      if (debugLevel.isEnabled)
+    def sendDebugMessage(messageText: String, debugLevel: Integer, placeholders: Placeholders, withPrefix: Boolean = true, withSuffix: Boolean = true): Boolean = {
+      if (DebugLevel.isActive(debugLevel))
         console.sendMessage(bukkolorize
           (
             syntax
@@ -58,8 +30,42 @@ object Debug {
       true
     }
   }
-  def debugMessage(messageText: String, debugLevel: DebugLevel, placeholders: Placeholders=Placeholders(), withPrefix: Boolean=true, withSuffix: Boolean=true): Boolean =
-    console.sendDebugMessage(messageText, debugLevel, placeholders, withPrefix, withSuffix)
+
+  /**
+   * 1 - 49 = Trace
+   * <p> 50 - 99 = Debug
+   * <p> 100 - 149 = Info
+   * <p> 150 - 199 = Warn
+   * <p> 200 - 249 = Error
+   * <p> 250+      = Fatal
+   */
+  case class debugMessage(messageText: String) {
+    private var debugLevel: Integer = DebugLevel.FATAL
+    private var placeholders: Placeholders = Placeholders()
+    private var withPrefix = true
+    private var withSuffix = true
+
+    def level(debugLevel: Integer): this.type = {
+      this.debugLevel = debugLevel
+      this
+    }
+
+    def placeholders(placeholders: Placeholders): this.type = {
+      this.placeholders = placeholders
+      this
+    }
+
+    def withPrefix(boolean: Boolean): this.type = {
+      this.withPrefix = boolean; this
+    }
+
+    def withSuffix(boolean: Boolean): this.type = {
+      this.withSuffix = boolean; this
+    }
+    {
+      console.sendDebugMessage(messageText, debugLevel, placeholders, withPrefix, withSuffix)
+    }
+  }
   def getPrefix(yes: Boolean=true): String = if yes then this.prefix else ""
   def getSuffix(yes: Boolean=true): String = if yes then this.suffix else ""
   def getSyntax: String = this.syntax
@@ -68,19 +74,19 @@ object Debug {
   def setSyntax(newVal: String): Unit = this.syntax = newVal
 }
 
-/**
- * @see [[Level]]
- */
-case class DebugLevel(level: Either[Level, Integer]):
-  private val debugLevel: Integer = Right(level).swap.getOrElse(150)
-
-  //def getAsInteger: Integer = levelMap.getOrElse(level.swap.getOrElse(Level.WARN), 150)
-
-  def isEnabled: Boolean = (Debug.getCurrentLevel <= debugLevel)
-end DebugLevel
-
 object DebugLevel {
-  def apply(level: Level): DebugLevel = DebugLevel(Left(level))
+  private var currentDebugLevel = 1
 
-  def apply(value: Integer): DebugLevel = DebugLevel(Right(value))
+  val TRACE = 1
+  val DEBUG = 50
+  val INFO = 100
+  val WARN = 150
+  val ERROR = 200
+  val FATAL = 250
+
+  def isActive(int: Int): Boolean = (this.currentDebugLevel <= int)
+
+  def get: Integer = this.currentDebugLevel
+
+  def set(newDebugLevel: Integer): Unit = this.currentDebugLevel = newDebugLevel
 }

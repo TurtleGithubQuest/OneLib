@@ -1,17 +1,14 @@
 package dev.turtle.onelib
+
 package command
 
 import OneLib.console
-import command.OneCommand.{commands, registerCommand}
-import configuration.MessagingExtension.defaultLanguage
-import configuration.OneConfig.config
-import message.Messaging.MessagingCommandSender
-import message.{Placeholder, Placeholders}
+import api.OneLibAPI
+import message.{Debug, OneCommandSender, Placeholder, Placeholders}
 import utils.Exceptions.{OneAssertionError, oneAssert}
 
-import org.bukkit.Bukkit
+import org.bukkit.command.CommandSender
 import org.bukkit.command.defaults.BukkitCommand
-import org.bukkit.command.{CommandMap, CommandSender}
 
 import java.util
 import scala.collection.mutable
@@ -20,10 +17,10 @@ import scala.language.postfixOps
 import scala.util.Try
 
 
-abstract class OneCommand(oneCommandName: String) extends BukkitCommand(oneCommandName) {
-  private var arguments: mutable.Map[String, Argument] = mutable.Map()
+class OneCommand(oneCommandName: String, oneLibAPI: OneLibAPI) extends BukkitCommand(oneCommandName) {
+  val arguments: mutable.Map[String, Argument] = mutable.Map.empty
   private[this] var suggestions: mutable.Map[String, mutable.Map[Integer, Suggestion]] = mutable.Map.empty
-  lazy val getArguments: mutable.Map[String, Argument] = arguments
+  //lazy val getArguments: mutable.Map[String, Argument] = arguments
   /**
    * @param Integer Position index
    * @param Array Available arguments which may be located on this index.
@@ -84,7 +81,7 @@ abstract class OneCommand(oneCommandName: String) extends BukkitCommand(oneComma
                     Placeholder("permission", arg.getRequiredPermission), Placeholder("sender", sender.getName)
                   )
                   sender.sendLocalizedMessage(e.formattedMessage(), placeholders)
-                  if (arg.shouldInformConsole && config(defaultLanguage).isPathPresent(e.formattedMessage("console"))) then
+                  if (arg.shouldInformConsole /*TODO: && config(defaultLanguage).isPathPresent(e.formattedMessage("console"))*/) then
                     console.asInstanceOf[CommandSender].sendLocalizedMessage(e.formattedMessage("console"), placeholders)
               }
             }
@@ -192,7 +189,6 @@ abstract class OneCommand(oneCommandName: String) extends BukkitCommand(oneComma
      * Suggestion initialization block
      */
     {
-      //println(this.getClass.getEnclosingClass.getSimpleName+" "+super.getClass.getSuperclass.getEnclosingClass.getSimpleName)
       suggestions.getOrElseUpdate(suggestionName, mutable.Map.empty).update(index, this)
     }
   }
@@ -203,33 +199,7 @@ abstract class OneCommand(oneCommandName: String) extends BukkitCommand(oneComma
    * Command initialization block
    */
   {
-    commands.put(this.commandName, this)
+    oneLibAPI.command.add(this)
   }
-  private lazy val register: Boolean = registerCommand(this)
-}
-object OneCommand {
-  var commands: mutable.Map[String, OneCommand] = mutable.Map()
-  val commandMap: CommandMap =
-  try {
-    val bukkitCommandMap = Bukkit.getServer.getClass.getDeclaredField("commandMap")
-    bukkitCommandMap.setAccessible(true)
-    bukkitCommandMap.get(Bukkit.getServer).asInstanceOf[CommandMap]
-  } catch {
-    case e: Exception =>
-      e.printStackTrace()
-      null
-  }
-  /**
-  * Adds command to OneLib's memory and tells Bukkit that it is available.
-  */
-  private def registerCommand(oneCommand: OneCommand): Boolean = {
-    commandMap.register(oneCommand.getName, oneCommand)
-    console.sendMessage(s"Loaded command '${oneCommand.getName}' containing '${oneCommand.arguments.size}' argument(s).")
-    true
-  }
-  def registerCommands: Boolean = {
-    commands.foreach(oneCommand => oneCommand._2.register)
-    true
-  }
-
+  lazy val register: Boolean = oneLibAPI.command.register(this)
 }

@@ -1,4 +1,5 @@
 package dev.turtle.onelib
+
 package message
 
 import message.Placeholder.{prefix, suffix}

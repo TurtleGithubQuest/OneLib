@@ -1,38 +1,40 @@
 package dev.turtle.onelib
 
+import api.{OneLibAPI, OnePlugin}
 import command.OneCommand
-import configuration.OneConfig
-import message.Debug.{Level, debugMessage}
+import message.Debug.debugMessage
+import message.DebugLevel.INFO
 import message.{Debug, DebugLevel}
 
 import org.bukkit.Bukkit.getConsoleSender
 import org.bukkit.command.ConsoleCommandSender
-import org.bukkit.plugin.java.JavaPlugin
 
 import scala.util.Try
 
 object OneLib:
-  var onelib: JavaPlugin = _
+  var onelib: OnePlugin = _
   val console: ConsoleCommandSender = getConsoleSender
   /**
    * 
   */
-  def registerPlugin(plugin: JavaPlugin): Boolean = {
-    if (Try(OneLib.onelib.isEnabled).isFailure) {
+  def registerPlugin(plugin: OnePlugin, onecommands: Seq[OneCommand]): Boolean = {
+    if (isOneLibRunning) {
       onelib = plugin
-      debugMessage(s"OneLib is running under ${plugin.getName}", debugLevel=DebugLevel(Level.INFO))
-    }
-    OneCommand.registerCommands
-    OneConfig.reloadAll
+      debugMessage(s"OneLib is running under ${plugin.getName}").level(INFO)
+    } else if plugin ne this.onelib then debugMessage(s"Plugin '${plugin.getName}' successfully hooked into OneLib.").level(INFO)
+    OneLibAPI(plugin).command.registerAll
+    //OneConfig.reloadAll
     true
   }
+
+  protected def isOneLibRunning: Boolean = Try(OneLib.onelib.isEnabled).isFailure
 end OneLib
 
-class OneLib extends JavaPlugin {
+class OneLib extends OnePlugin {
   override def onEnable(): Unit = {
     OneLib.onelib=this
-    OneLib.registerPlugin(this)
-    debugMessage(s"OneLib is running in standalone mode.", debugLevel=DebugLevel(Level.INFO))
+    OneLib.registerPlugin(this, Seq())
+    debugMessage(s"OneLib is running in standalone mode.").level(INFO)
   }
 
   override def onDisable(): Unit = {
